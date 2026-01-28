@@ -12,20 +12,12 @@
     ],
     "routes": [
       {
+        "src": "/api/bookings/(.*)",
+        "dest": "/api/bookings/[id].js"
+      },
+      {
         "src": "/api/(.*)",
-        "dest": "/api/$1"
-      },
-      {
-        "src": "/",
-        "dest": "/public/index.html"
-      },
-      {
-        "src": "/booking",
-        "dest": "/public/booking.html"
-      },
-      {
-        "src": "/admin",
-        "dest": "/public/admin.html"
+        "dest": "/api/$1.js"
       },
       {
         "src": "/(.*)",
