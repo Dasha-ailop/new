@@ -2,34 +2,34 @@
     "version": 2,
     "builds": [
       {
-        "src": "backend/server.js",
-        "use": "@vercel/node"
+        "src": "public/**",
+        "use": "@vercel/static"
       },
       {
-        "src": "frontend/*",
-        "use": "@vercel/static"
+        "src": "api/**/*.js",
+        "use": "@vercel/node"
       }
     ],
     "routes": [
       {
         "src": "/api/(.*)",
-        "dest": "/backend/server.js"
-      },
-      {
-        "src": "/(.*\\.(css|js))",
-        "dest": "/frontend/$1"
-      },
-      {
-        "src": "/admin",
-        "dest": "/frontend/admin.html"
-      },
-      {
-        "src": "/booking",
-        "dest": "/frontend/booking.html"
+        "dest": "/api/$1"
       },
       {
         "src": "/",
-        "dest": "/frontend/index.html"
+        "dest": "/public/index.html"
+      },
+      {
+        "src": "/booking",
+        "dest": "/public/booking.html"
+      },
+      {
+        "src": "/admin",
+        "dest": "/public/admin.html"
+      },
+      {
+        "src": "/(.*)",
+        "dest": "/public/$1"
       }
     ]
   }

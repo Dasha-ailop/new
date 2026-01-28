@@ -1,16 +1,11 @@
 {
     "name": "school-booking-system",
     "version": "1.0.0",
-    "description": "Система записи на консультации с бэкендом",
     "scripts": {
-      "start": "node backend/server.js",
-      "dev": "nodemon backend/server.js",
-      "build-frontend": "echo 'Frontend built'",
-      "deploy": "npm run build-frontend && vercel --prod"
+      "dev": "vercel dev"
     },
     "dependencies": {},
-    "devDependencies": {},
-    "engines": {
-      "node": ">=16.0.0"
+    "devDependencies": {
+      "@vercel/node": "^3.0.0"
     }
   }

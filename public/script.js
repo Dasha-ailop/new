@@ -1,3 +1,24 @@
+// Автоматическое определение базового URL API
+const API_BASE = window.location.hostname.includes('vercel.app') 
+  ? '/api' 
+  : window.location.hostname === 'localhost' 
+    ? 'http://localhost:3000/api' 
+    : '/api';
+
+console.log('API Base:', API_BASE);
+
+// Обновите все fetch вызовы:
+async function fetchBookings() {
+  try {
+    const response = await fetch(`${API_BASE}/bookings`);
+    if (!response.ok) throw new Error('Ошибка загрузки данных');
+    return await response.json();
+  } catch (error) {
+    console.error('Ошибка:', error);
+    return [];
+  }
+}
+
 // script.js - Полностью обновленный скрипт с API интеграцией
 document.addEventListener('DOMContentLoaded', function() {
     console.log('Документ загружен, инициализация приложения...');
