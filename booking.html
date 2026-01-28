@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Запись на прием</title>
+    <link rel="stylesheet" href="/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Библиотека для календаря с выбором суббот -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    <script src="https://npmcdn.com/flatpickr/dist/l10n/ru.js"></script>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1><i class="fas fa-calendar-alt"></i> Запись на консультацию к учителю</h1>
+            <nav>
+                <a href="/"><i class="fas fa-home"></i> На главную</a>
+                <a href="/admin"><i class="fas fa-user-shield"></i> Вход для админа</a>
+            </nav>
+        </header>
+
+        <main>
+            <div class="booking-form">
+                <h2>Форма записи</h2>
+                <p>Заполните форму ниже, чтобы записаться на консультацию к учителю. <strong>Консультации проводятся только по субботам с 11:30 до 13:00.</strong></p>
+                
+                <form id="bookingForm">
+                    <div class="form-group">
+                        <label for="teacher"><i class="fas fa-user-tie"></i> Выберите учителя:</label>
+                        <select id="teacher" name="teacher" required>
+                            <option value="">-- Выберите учителя --</option>
+                            <!-- Учителя будут загружены через JavaScript -->
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="date"><i class="fas fa-calendar-day"></i> Выберите субботу:</label>
+                        <div class="date-picker-container">
+                            <input type="text" id="date" name="date" class="date-input" required placeholder="Выберите субботу" readonly>
+                            <div class="calendar-info">
+                                <p><i class="fas fa-info-circle"></i> В календаре доступны только субботы</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label><i class="fas fa-clock"></i> Выберите время консультации(20 минут):</label>
+                        <div class="time-slots">
+                            <div class="time-info">
+                                <p><i class="fas fa-info-circle"></i> Консультации родителей проводится с 11:30 до 13:00</p>
+                            </div>
+                            <!-- Слоты времени будут созданы динамически через JavaScript -->
+                        </div>
+                        <input type="hidden" id="selectedTime" name="selectedTime" required>
+                        <p class="time-hint">Каждая консультация длится 20 минут. <span id="occupiedSlotsInfo"></span></p>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="parentName"><i class="fas fa-user"></i> ФИО родителя:</label>
+                        <input type="text" id="parentName" name="parentName" required placeholder="Введите ваше ФИО">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="studentName"><i class="fas fa-graduation-cap"></i> ФИО ученика:</label>
+                        <input type="text" id="studentName" name="studentName" required placeholder="Введите ФИО ученика">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="studentClass"><i class="fas fa-school"></i> Класс ученика:</label>
+                        <select id="studentClass" name="studentClass" required>
+                            <option value="">-- Выберите класс --</option>
+                            <!-- 1 классы -->
+                            <option value="1а">1а</option>
+                            <option value="1б">1б</option>
+                            <option value="1в">1в</option>
+                            <option value="1г">1г</option>
+                            <option value="1д">1д</option>
+                            <option value="1е">1е</option>
+                            <option value="1ж">1ж</option>
+                            <option value="1з">1з</option>
+                            <option value="1и">1и</option>
+                            <option value="1к">1к</option>
+                            <option value="1л">1л</option>
+                            <option value="1м">1м</option>
+                            <option value="1н">1н</option>
+                            <option value="1р">1р</option>
+                            
+                            <!-- 2 классы -->
+                            <option value="2а">2а</option>
+                            <option value="2б">2б</option>
+                            <option value="2в">2в</option>
+                            <option value="2г">2г</option>
+                            <option value="2д">2д</option>
+                            <option value="2е">2е</option>
+                            <option value="2ж">2ж</option>
+                            <option value="2з">2з</option>
+                            <option value="2и">2и</option>
+                            <option value="2к">2к</option>
+                            <option value="2л">2л</option>
+                            <option value="2м">2м</option>
+                            <option value="2н">2н</option>
+                            <option value="2о">2о</option>
+                            
+                            <!-- 3 классы -->
+                            <option value="3а">3а</option>
+                            <option value="3б">3б</option>
+                            <option value="3в">3в</option>
+                            <option value="3г">3г</option>
+                            <option value="3д">3д</option>
+                            
+                            <!-- 4 классы -->
+                            <option value="4а">4а</option>
+                            <option value="4б">4б</option>
+                            <option value="4в">4в</option>
+                            <option value="4г">4г</option>
+                            <option value="4д">4д</option>
+                            
+                            <!-- 5 классы -->
+                            <option value="5а">5а</option>
+                            <option value="5б">5б</option>
+                            <option value="5в">5в</option>
+                            <option value="5г">5г</option>
+                            <option value="5д">5д</option>
+                            <option value="5е">5е</option>
+                            <option value="5и">5и</option>
+                            
+                            <!-- 6 классы -->
+                            <option value="6а">6а</option>
+                            <option value="6б">6б</option>
+                            <option value="6в">6в</option>
+                            <option value="6г">6г</option>
+                            <option value="6д">6д</option>
+                            <option value="6е">6е</option>
+                            
+                            <!-- 7 классы -->
+                            <option value="7а">7а</option>
+                            <option value="7б">7б</option>
+                            <option value="7в">7в</option>
+                            <option value="7г">7г</option>
+                            <option value="7д">7д</option>
+                            
+                            <!-- 8 классы -->
+                            <option value="8а">8а</option>
+                            <option value="8б">8б</option>
+                            <option value="8в">8в</option>
+                            <option value="8г">8г</option>
+                            <option value="8и">8и</option>
+                            
+                            <!-- 9 классы -->
+                            <option value="9а">9а</option>
+                            <option value="9б">9б</option>
+                            <option value="9в">9в</option>
+                            
+                            <!-- 10 классы -->
+                            <option value="10а">10а</option>
+                            <option value="10б Ест-нау">10б Ест-нау</option>
+                            <option value="10б Соц-эко">10б Соц-эко</option>
+                            
+                            <!-- 11 классы -->
+                            <option value="11а">11а</option>
+                            <option value="11б">11б</option>
+                            <option value="11в">11в</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="phone"><i class="fas fa-phone"></i> Контактный телефон:</label>
+                        <input type="tel" id="phone" name="phone" required placeholder="+7 (XXX) XXX-XX-XX">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="email"><i class="fas fa-envelope"></i> Email:</label>
+                        <input type="email" id="email" name="email" required placeholder="example@mail.ru">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="comment"><i class="fas fa-comment"></i> Комментарий (необязательно):</label>
+                        <textarea id="comment" name="comment" rows="3" placeholder="Укажите тему для обсуждения или дополнительные пожелания"></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-paper-plane"></i> Отправить запись
+                        </button>
+                        <button type="button" class="btn btn-secondary" id="resetBtn">
+                            <i class="fas fa-redo"></i> Очистить форму
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+            <div class="booking-info">
+                <h3><i class="fas fa-exclamation-circle"></i> Важная информация</h3>
+                <ul>
+                    <li><strong>Консультации родителей проводится только по субботам</strong></li>
+                    <li><strong>Время консультации: с 11:30 до 13:00</strong></li>
+                    <li><strong>Продолжительность консультации: 20 минут на одного родителя</strong></li>     
+                    <li><strong>Пожалуйста, приходите за 5 минут до назначенного времени</strong></li>
+                </ul>
+            </div>
+        </main>
+
+        <footer>
+            <p>Школа №133 г. Екатеринбург | Контактный телефон: +7 (343) 30-30-133</p>
+            <p>© 2026 Система записи на консультации. Все права защищены.</p>
+        </footer>
+    </div>
+
+    <div id="successModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3><i class="fas fa-check-circle"></i> Запись успешно отправлена!</h3>
+            </div>
+            <div class="modal-body">
+                <p>Ваша запись на консультацию была успешно отправлена администратору.</p>
+                <div id="bookingDetails"></div>
+            </div>
+            <div class="modal-footer">
+                <button id="closeModal" class="btn btn-primary">ОК</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
