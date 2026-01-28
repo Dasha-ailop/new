@@ -1,144 +1,77 @@
-const fs = require('fs');
-const path = require('path');
-
-const DATA_FILE = path.join(__dirname, '../data/bookings.json');
-
-// Инициализация файла данных
-function initDataFile() {
-  if (!fs.existsSync(DATA_FILE)) {
-    fs.writeFileSync(DATA_FILE, JSON.stringify({ bookings: [] }, null, 2));
-  }
-}
-
-// Middleware CORS
-function cors(res) {
-  res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
-}
-
-module.exports = async (req, res) => {
-  cors(res);
-  
-  // Handle CORS preflight
-  if (req.method === 'OPTIONS') {
-    res.status(200).end();
-    return;
-  }
-  
-  initDataFile();
-  
-  const { method, url } = req;
-  const urlParts = url.split('/').filter(part => part);
-  
-  // GET /api/bookings
-  if (method === 'GET' && urlParts[1] === 'bookings') {
-    try {
-      const data = JSON.parse(fs.readFileSync(DATA_FILE, 'utf8'));
-      res.status(200).json(data.bookings);
-    } catch (error) {
-      res.status(500).json({ error: 'Ошибка чтения данных' });
+// api/bookings.js
+export default async function handler(req, res) {
+    // Разрешаем CORS
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    res.setHeader('Access-Control-Allow-Methods', 'GET,POST,PUT,DELETE,OPTIONS');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+    
+    if (req.method === 'OPTIONS') {
+      return res.status(200).end();
     }
-    return;
-  }
-  
-  // POST /api/bookings
-  if (method === 'POST' && urlParts[1] === 'bookings') {
-    let body = '';
-    req.on('data', chunk => body += chunk);
-    req.on('end', async () => {
-      try {
-        const booking = JSON.parse(body);
-        booking.id = Date.now();
-        booking.createdAt = new Date().toISOString();
-        booking.status = 'новая';
-        
-        const data = JSON.parse(fs.readFileSync(DATA_FILE, 'utf8'));
-        data.bookings.push(booking);
-        fs.writeFileSync(DATA_FILE, JSON.stringify(data, null, 2));
-        
-        res.status(201).json({ success: true, bookingId: booking.id });
-      } catch (error) {
-        res.status(400).json({ error: 'Ошибка данных' });
-      }
-    });
-    return;
-  }
-  
-  // PUT /api/bookings/:id
-  if (method === 'PUT' && urlParts[1] === 'bookings' && urlParts[2]) {
-    let body = '';
-    req.on('data', chunk => body += chunk);
-    req.on('end', async () => {
-      try {
-        const { status } = JSON.parse(body);
-        const bookingId = parseInt(urlParts[2]);
-        
-        const data = JSON.parse(fs.readFileSync(DATA_FILE, 'utf8'));
-        const booking = data.bookings.find(b => b.id === bookingId);
-        
-        if (!booking) {
-          res.status(404).json({ error: 'Запись не найдена' });
-          return;
-        }
-        
-        booking.status = status;
-        booking.updatedAt = new Date().toISOString();
-        fs.writeFileSync(DATA_FILE, JSON.stringify(data, null, 2));
-        
-        res.status(200).json({ success: true });
-      } catch (error) {
-        res.status(400).json({ error: 'Ошибка обновления' });
-      }
-    });
-    return;
-  }
-  
-  // DELETE /api/bookings/:id
-  if (method === 'DELETE' && urlParts[1] === 'bookings' && urlParts[2]) {
-    try {
-      const bookingId = parseInt(urlParts[2]);
-      const data = JSON.parse(fs.readFileSync(DATA_FILE, 'utf8'));
-      const initialLength = data.bookings.length;
-      
-      data.bookings = data.bookings.filter(b => b.id !== bookingId);
-      
-      if (data.bookings.length === initialLength) {
-        res.status(404).json({ error: 'Запись не найдена' });
-        return;
-      }
-      
-      fs.writeFileSync(DATA_FILE, JSON.stringify(data, null, 2));
-      res.status(200).json({ success: true });
-    } catch (error) {
-      res.status(500).json({ error: 'Ошибка удаления' });
+    
+    console.log(`API: ${req.method} ${req.url}`);
+    
+    // Храним данные в памяти (временное решение)
+    if (!global.bookingsData) {
+      global.bookingsData = {
+        bookings: [],
+        users: [{ username: 'admin', password: 'admin123' }]
+      };
     }
-    return;
-  }
-  
-  // POST /api/auth/login
-  if (method === 'POST' && urlParts[1] === 'auth' && urlParts[2] === 'login') {
-    let body = '';
-    req.on('data', chunk => body += chunk);
-    req.on('end', async () => {
+    
+    // GET /api/bookings
+    if (req.method === 'GET' && req.url === '/api/bookings') {
+      return res.status(200).json(global.bookingsData.bookings);
+    }
+    
+    // POST /api/bookings
+    if (req.method === 'POST' && req.url === '/api/bookings') {
       try {
-        const { username, password } = JSON.parse(body);
+        const body = req.body;
+        const booking = {
+          ...body,
+          id: Date.now(),
+          status: 'новая',
+          createdAt: new Date().toISOString(),
+          teacherName: body.teacher.split('|')[0],
+          teacherRoom: body.teacher.split('|')[1] || 'не указан'
+        };
         
-        // Простая проверка (в реальном приложении используйте хеширование)
-        if (username === 'admin' && password === 'admin123') {
-          res.status(200).json({ 
-            success: true, 
-            message: 'Вход выполнен успешно'
-          });
-        } else {
-          res.status(401).json({ error: 'Неверные учетные данные' });
-        }
+        global.bookingsData.bookings.push(booking);
+        
+        return res.status(201).json({ 
+          success: true, 
+          message: 'Запись создана',
+          bookingId: booking.id
+        });
       } catch (error) {
-        res.status(400).json({ error: 'Ошибка данных' });
+        return res.status(400).json({ error: 'Ошибка данных' });
       }
+    }
+    
+    // POST /api/auth/login
+    if (req.method === 'POST' && req.url === '/api/auth/login') {
+      const { username, password } = req.body;
+      
+      const user = global.bookingsData.users.find(
+        u => u.username === username && u.password === password
+      );
+      
+      if (user) {
+        return res.status(200).json({ 
+          success: true, 
+          message: 'Вход успешен'
+        });
+      } else {
+        return res.status(401).json({ error: 'Неверные учетные данные' });
+      }
+    }
+    
+    // Для остальных маршрутов возвращаем заглушки
+    return res.status(200).json({ 
+      success: true, 
+      message: 'API работает',
+      method: req.method,
+      url: req.url
     });
-    return;
   }
-  
-  res.status(404).json({ error: 'Маршрут не найден' });
-};
